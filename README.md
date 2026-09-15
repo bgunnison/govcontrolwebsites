@@ -7,7 +7,7 @@ This repository coordinates three otherwise separate static-site projects:
 - `governmenthealthcarecontrol.com/`
 
 Each site keeps its own configuration, updater, builder, tests, and local articles.
-Root-level scripts share SSH/SCP deployment, backups, and Windows scheduling.
+Root-level scripts share SSH/SCP deployment, backups, and Windows/Linux scheduling.
 Repository: [bgunnison/govcontrolwebsites](https://github.com/bgunnison/govcontrolwebsites).
 
 ## Fresh clone setup
@@ -57,7 +57,7 @@ environments, `dist/`, backups, logs, and machine-generated status files out of 
 No publishing license has been selected.
 
 The GitHub Actions workflow runs offline regression tests and rebuilds/verifies all
-three sites with empty archives on Windows. It never generates news, connects to the web servers,
+three sites with empty archives on Windows and Linux. It never generates news, connects to the web servers,
 registers the Windows task, or deploys; no API/SSH secrets are needed in GitHub.
 
 Before committing, review the staged files and run:
@@ -95,8 +95,36 @@ It is a guardrail, not a guarantee that arbitrary secrets cannot be committed.
 
 ## Weekly automatic update and deployment
 
-Windows Task Scheduler runs `GovControl Weekly Update and Deploy` every Sunday
-at **10:00 PM Pacific**, following Windows daylight-saving time. Codex does not
+The production schedule runs on Bluehost every **Sunday at 10 PM server local
+time**, independently of the desktop. It uses a private Python 3.11 environment
+and a source/content directory outside the public web roots. `private.py` is
+owner-readable only (600), inside an owner-only directory (700). Actual posts,
+credentials, notification recipients, logs, and backups are kept out of GitHub.
+Failure emails go to `WEEKLY_ALERT_EMAIL` in `private.py`; successful runs are quiet.
+Credentials are redacted from updater logs, the weekly log, status, and email summaries.
+
+To reproduce the Linux setup after installing Python and restoring private content:
+
+```sh
+python -m pip install -r requirements.txt
+chmod 700 .
+chmod 600 private.py
+python -m unittest test_weekly_run test_backup test_ssh_deploy
+python update_all.py --build-only
+python weekly_run.py --dry-run
+python weekly_run.py --test-email
+python schedule/install_linux.py --install
+```
+
+The installer preserves existing cron jobs, saves the old crontab privately in
+`logs/`, and verifies the new entry without starting it. Disable the old desktop
+task after validating the server installation to avoid duplicate API usage and
+deployments. Server posts become the working archive; sync them privately before
+using the desktop's manual deployment commands. Backups made on Bluehost share
+the hosting account; retain a separate off-server copy for recovery.
+
+Windows Task Scheduler remains an alternative: `GovControl Weekly Update and Deploy`
+runs every Sunday at **10:00 PM Pacific**, following Windows daylight-saving time. Codex does not
 need to be open. The task uses your existing Windows sign-in; locking the screen
 is fine, but signing out prevents it from running until you sign in again.
 It requests wake-from-sleep and runs a missed schedule when Windows is available.

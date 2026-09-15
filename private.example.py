@@ -3,6 +3,9 @@
 # Used by update.bat. You may set OPENAI_API_KEY in the environment instead.
 OPENAI_API_KEY = ""
 
+# Linux/Bluehost weekly failures only. Keep the actual recipient in private.py.
+WEEKLY_ALERT_EMAIL = ""
+
 # Local estimated-cost stop for one update.bat run. Configure the OpenAI project
 # budget as the authoritative billing safeguard.
 OPENAI_MAX_UPDATE_COST_USD = 5.00

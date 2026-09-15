@@ -10,7 +10,10 @@ permissions:
 
 jobs:
   verify:
-    runs-on: windows-latest
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 15
     steps:
       - name: Enable long article paths on the Windows runner
@@ -36,6 +39,7 @@ jobs:
       - name: Build and verify all three sites with empty archives
         run: python update_all.py --build-only
       - name: Parse Windows scheduling scripts without installing or running them
+        if: runner.os == 'Windows'
         shell: pwsh
         run: |
           Get-ChildItem -LiteralPath schedule -Filter '*.ps1' | ForEach-Object {

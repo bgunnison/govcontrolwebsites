@@ -2,14 +2,17 @@ from __future__ import annotations
 
 import json
 import subprocess
+import sys
 import tempfile
+import time
 import unittest
 from contextlib import nullcontext
 from datetime import datetime
-from pathlib import Path
-from unittest.mock import MagicMock, patch
+from pathlib import Path, PurePosixPath
+from unittest.mock import patch
 
 import weekly_run as weekly
+from schedule.install_linux import cron_text
 
 
 class WeeklyRunTests(unittest.TestCase):
@@ -102,35 +105,46 @@ class WeeklyRunTests(unittest.TestCase):
 
     def test_topic_error_output_blocks_deployment_even_with_zero_exit(self):
         self.logs.mkdir(parents=True)
+        (self.root / "update_all.py").write_text('print(\'{"event":"research_error","category":"ethics"}\')\n')
         with (self.logs / "test.log").open("ab") as log:
-            process = MagicMock()
-            process.wait.return_value = 0
-
-            def launch(*args, **kwargs):
-                kwargs["stdout"].write(b'{"event":"research_error","category":"ethics"}\n')
-                kwargs["stdout"].flush()
-                return process
-
-            with patch.object(weekly.subprocess, "Popen", side_effect=launch):
-                with self.assertRaisesRegex(RuntimeError, "research_error"):
-                    weekly.run_step("Update", "update_all.py", (), log)
+            with self.assertRaisesRegex(RuntimeError, "research_error"):
+                weekly.run_step("Update", "update_all.py", (), log)
 
     def test_nonzero_exit_and_timeout_are_failures(self):
         self.logs.mkdir(parents=True)
+        script = self.root / "backup_all.py"
+        script.write_text('raise SystemExit(7)\n')
         with (self.logs / "test.log").open("ab") as log:
-            process = MagicMock(pid=12345)
-            process.wait.return_value = 7
-            with patch.object(weekly.subprocess, "Popen", return_value=process):
-                with self.assertRaisesRegex(RuntimeError, "exit code 7"):
-                    weekly.run_step("Backup", "backup_all.py", (), log)
-            process.wait.side_effect = [subprocess.TimeoutExpired("test", 1), 0]
-            with (
-                patch.object(weekly.subprocess, "Popen", return_value=process),
-                patch.object(weekly.subprocess, "run") as terminate,
-            ):
+            with self.assertRaisesRegex(RuntimeError, "exit code 7"):
+                weekly.run_step("Backup", "backup_all.py", (), log)
+            script.write_text('import time\ntime.sleep(30)\n')
+            with patch.object(weekly, "STEP_TIMEOUT_SECONDS", 0.3):
                 with self.assertRaisesRegex(RuntimeError, "process tree was stopped"):
                     weekly.run_step("Backup", "backup_all.py", (), log)
-            self.assertEqual(terminate.call_args.args[0], ["taskkill.exe", "/PID", "12345", "/T", "/F"])
+
+    def test_timeout_stops_descendants(self):
+        self.logs.mkdir(parents=True)
+        marker = self.root / "descendant-survived.txt"
+        child = f'import time; from pathlib import Path; time.sleep(2); Path({str(marker)!r}).write_text("alive")'
+        (self.root / "backup_all.py").write_text(
+            f'import subprocess,sys,time\nsubprocess.Popen([sys.executable, "-c", {child!r}])\ntime.sleep(30)\n'
+        )
+        with (self.logs / "test.log").open("ab") as log, patch.object(weekly, "STEP_TIMEOUT_SECONDS", 0.7):
+            with self.assertRaisesRegex(RuntimeError, "process tree was stopped"):
+                weekly.run_step("Backup", "backup_all.py", (), log)
+        time.sleep(2)
+        self.assertFalse(marker.exists())
+
+    def test_child_output_is_redacted_before_it_reaches_disk(self):
+        self.logs.mkdir(parents=True)
+        credential = "synthetic-credential-1234"
+        (self.root / "private.py").write_text(f'OPENAI_API_KEY = {credential!r}\n')
+        (self.root / "backup_all.py").write_text(f'print({credential!r})\n')
+        path = self.logs / "test.log"
+        with path.open("ab") as log:
+            weekly.run_step("Backup", "backup_all.py", (), log)
+        self.assertNotIn(credential, path.read_text())
+        self.assertIn("[REDACTED]", path.read_text())
 
     def test_notification_failure_still_leaves_failure_log_and_exit_code(self):
         self.notify.side_effect = RuntimeError("notifications disabled")
@@ -138,6 +152,59 @@ class WeeklyRunTests(unittest.TestCase):
             self.assertEqual(weekly.execute_run(), 1)
         self.assertEqual(self.state()["status"], "failed")
         self.assertIn("notifications disabled", Path(self.state()["log"]).read_text())
+
+
+class PlatformAndEmailTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = self.enterContext(tempfile.TemporaryDirectory())
+        self.root = Path(self.temp)
+        self.enterContext(patch.object(weekly, "ROOT", self.root))
+        self.enterContext(patch.object(weekly, "LOG_DIR", self.root / "logs"))
+        (self.root / "private.py").write_text('WEEKLY_ALERT_EMAIL = "alerts@example.com"\n')
+
+    def test_real_lock_blocks_another_process_and_releases(self):
+        lock_path = self.root / "runner.lock"
+        code = (
+            'import sys; from pathlib import Path; import weekly_run as w\n'
+            'try:\n with w.run_lock(Path(sys.argv[1])): pass\n'
+            'except w.AlreadyRunningError:\n sys.exit(7)\n'
+        )
+        with weekly.run_lock(lock_path):
+            result = subprocess.run([sys.executable, '-c', code, str(lock_path)], capture_output=True)
+            self.assertEqual(result.returncode, 7, result.stderr)
+        result = subprocess.run([sys.executable, '-c', code, str(lock_path)], capture_output=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_linux_success_does_not_send_email(self):
+        with patch.object(weekly, "IS_WINDOWS", False), patch.object(weekly, "send_email") as send:
+            weekly.notify_failure(self.root / "test.log", resolved=True)
+            send.assert_not_called()
+
+    def test_email_has_failure_summary_but_no_credentials_or_raw_log(self):
+        (self.root / "logs").mkdir()
+        (self.root / "private.py").write_text('WEEKLY_ALERT_EMAIL = "alerts@example.com"\nSSH_PASSWORD = "synthetic-password"\n')
+        (self.root / "logs/latest-status.json").write_text(json.dumps({
+            "step": "Backup", "error": "synthetic-password authentication failed",
+        }))
+        with patch.object(weekly.shutil, "which", return_value="/usr/bin/mail"), patch.object(weekly.subprocess, "run") as send:
+            weekly.send_email(self.root / "private-run.log")
+        self.assertEqual(send.call_args.args[0][-1], "alerts@example.com")
+        body = send.call_args.kwargs["input"].decode()
+        self.assertIn("Backup", body)
+        self.assertIn("[REDACTED]", body)
+        self.assertNotIn("synthetic-password", body)
+
+    def test_email_rejects_header_or_argument_injection(self):
+        (self.root / "private.py").write_text('WEEKLY_ALERT_EMAIL = "-X/tmp/test@example.com"\n')
+        with self.assertRaisesRegex(RuntimeError, "valid WEEKLY_ALERT_EMAIL"):
+            weekly.alert_recipient()
+
+    def test_cron_preserves_existing_jobs_and_replaces_its_own_entry(self):
+        existing = 'MAILTO="previous@example.com"\n15 2 * * * /bin/true\n'
+        configured = cron_text(existing, "alerts@example.com", PurePosixPath("/home/test/private app"), PurePosixPath("/home/test/venv/bin/python"))
+        self.assertTrue(configured.startswith(existing))
+        self.assertIn("0 22 * * 0 cd '/home/test/private app'", configured)
+        self.assertEqual(cron_text(configured, "alerts@example.com", PurePosixPath("/home/test/private app"), PurePosixPath("/home/test/venv/bin/python")), configured)
 
 
 if __name__ == "__main__":

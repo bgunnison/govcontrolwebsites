@@ -16,6 +16,10 @@ import requests
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
+if str(ROOT.parent) not in sys.path:
+    sys.path.append(str(ROOT.parent))
+
+from redaction import redact_text
 
 from site_config import GENERATE_SETTINGS, SITE_SETTINGS
 from update.prompt_lib import expand_topic_prompt, load_prompt_config, mark_topic_used, today_prompt_date
@@ -52,7 +56,7 @@ def append_log(path: Path, event: str, **fields: Any) -> None:
         "event": event,
     }
     record.update(fields)
-    line = json.dumps(record, ensure_ascii=False)
+    line = redact_text(json.dumps(record, ensure_ascii=False), (str(GENERATE_SETTINGS.get("api_key") or ""),))
     with open(path, "a", encoding="utf-8") as handle:
         handle.write(line + "\n")
     print(line, flush=True)
@@ -448,7 +452,7 @@ def call_openai_json(
                 timeout=180,
             )
         except requests.RequestException as exc:
-            last_error = RuntimeError(f"OpenAI network error: {exc}")
+            last_error = RuntimeError(redact_text(f"OpenAI network error: {exc}", (api_key,)))
             if attempt >= max_attempts:
                 raise last_error from exc
             delay = retry_delay(None, attempt, cfg)
@@ -460,6 +464,7 @@ def call_openai_json(
 
         if response.status_code >= 400:
             error_type, error_code, message, request_id = openai_error_details(response)
+            message = redact_text(message, (api_key,))
             suffix = f" (request {request_id})" if request_id else ""
             if response.status_code == 429 and (
                 error_type in {"insufficient_quota", "billing_error"}

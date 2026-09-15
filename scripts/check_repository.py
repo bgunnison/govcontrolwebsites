@@ -66,12 +66,12 @@ def main() -> int:
         return 1
 
     sizes = git(
-        "cat-file", "--batch-check=%(objectname) %(objectsize)",
+        "cat-file", "--batch-check",
         input_data=("\n".join(blobs) + "\n").encode("ascii"),
     )
     total_bytes = 0
     for line in sizes.decode("ascii").splitlines():
-        object_id, size = line.split()
+        object_id, object_type, size = line.split()
         total_bytes += int(size) * len(blobs[object_id])
         if int(size) > MAX_FILE_BYTES:
             errors.extend(f"File exceeds the 50 MiB review threshold: {path}" for path in blobs[object_id])
