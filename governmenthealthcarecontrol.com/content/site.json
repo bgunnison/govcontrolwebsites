@@ -1,0 +1,36 @@
+{
+  "branding": {
+    "site_name": "Government Healthcare Control",
+    "description": "Government Healthcare Control is a developing source-backed archive about how public institutions shape healthcare access, cost, coverage, law, privacy, ethics, and delivery."
+  },
+  "navigation": [],
+  "hero": {
+    "eyebrow": "Independent Archive",
+    "title": "Government Healthcare Control",
+    "intro": "A category-driven archive for healthcare policy, public programs, rights, cost, access, privacy, and institutional accountability.",
+    "primary_cta_label": "Read the latest posts",
+    "primary_cta_href": "/posts/",
+    "secondary_cta_label": "About this site",
+    "secondary_cta_href": "/about/"
+  },
+  "sections": {
+    "categories": {"eyebrow": "Categories", "title": "Categories", "link_label": "Browse all categories", "link_href": "/categories/"},
+    "latest": {"eyebrow": "Latest", "title": "Latest Posts", "link_label": "All posts", "link_href": "/posts/"},
+    "featured": {"eyebrow": "Public Interest", "title": "Selected coverage"}
+  },
+  "pages": {
+    "posts": {"eyebrow": "Archive", "title": "Latest Posts", "intro": "Source-backed reporting and public material about government healthcare policy and delivery."},
+    "categories": {"eyebrow": "Topic Archives", "title": "Coverage categories", "intro": "Browse healthcare coverage by access, cost, coverage, public programs, law, legislation, politics, privacy, and ethics."},
+    "about": {
+      "eyebrow": "About",
+      "title": "About This Site",
+      "intro": "Government Healthcare Control tracks how public institutions shape the financing, regulation, access, and delivery of healthcare.",
+      "cards": [
+        {"eyebrow": "1. Watch", "title": "Track public action", "body": "Coverage follows legislation, agencies, court decisions, public programs, research, and institutional change.", "accent": "navy"},
+        {"eyebrow": "2. Update", "title": "Publish source-backed research", "body": "New material is curated into local records and reviewed before the static archive is rebuilt.", "accent": "teal"},
+        {"eyebrow": "3. Preserve", "title": "Maintain a durable archive", "body": "Permanent topic and article pages keep healthcare information straightforward to browse and cite.", "accent": "gold"}
+      ]
+    }
+  },
+  "footer": {"line_one": "", "line_two": "GOVERNMENT HEALTHCARE CONTROL\n© Virtual Robot"}
+}

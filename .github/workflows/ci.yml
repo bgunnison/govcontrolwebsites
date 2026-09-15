@@ -1,0 +1,46 @@
+name: Offline checks
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - name: Enable long article paths on the Windows runner
+        run: git config --global core.longpaths true
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: '**/requirements.txt'
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Audit committed files
+        run: python scripts/check_repository.py
+      - name: Verify posts stay excluded from Git
+        run: python -m unittest scripts.test_check_repository
+      - name: Run offline orchestration tests
+        run: python -m unittest test_weekly_run test_backup test_ssh_deploy
+      - name: Build and verify all three sites with empty archives
+        run: python update_all.py --build-only
+      - name: Parse Windows scheduling scripts without installing or running them
+        shell: pwsh
+        run: |
+          Get-ChildItem -LiteralPath schedule -Filter '*.ps1' | ForEach-Object {
+            $tokens = $null
+            $parseErrors = $null
+            [System.Management.Automation.Language.Parser]::ParseFile($_.FullName, [ref]$tokens, [ref]$parseErrors) | Out-Null
+            if ($parseErrors.Count) { throw "Invalid PowerShell syntax in $($_.Name)" }
+          }

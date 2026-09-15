@@ -1,0 +1,42 @@
+# Local credentials and authentication material (keep sanitized examples).
+private*.py
+!private.example.py
+.env
+.env.*
+!.env.example
+.ssh/
+id_rsa*
+id_ed25519*
+id_ecdsa*
+id_dsa*
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Local article content and WordPress imports. Never publish these to GitHub.
+posts/
+imported_media/
+wordpress-import.json
+
+# Generated builds, backups, logs, and machine-specific status.
+__pycache__/
+logs/
+backups/
+dist/
+*.pyc
+WEEKLY_STATUS.txt
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+htmlcov/
+.coverage
+coverage.xml
+*.log
+*.uploading
+*.tmp
+.DS_Store
+Thumbs.db
+Desktop.ini

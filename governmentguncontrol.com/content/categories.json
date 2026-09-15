@@ -1,0 +1,93 @@
+[
+  {
+    "name": "Amendments",
+    "slug": "amendments",
+    "description": "Constitutional amendments, the Second Amendment, and competing interpretations of firearms rights.",
+    "question": "How are constitutional rights being interpreted as firearms law changes?",
+    "query": "Second Amendment firearms constitutional rights court government",
+    "accent": "navy",
+    "hero_image": "hero-panel"
+  },
+  {
+    "name": "Politics",
+    "slug": "politics",
+    "description": "Elections, executive action, public officials, parties, and political conflict around firearms.",
+    "question": "How is firearms policy shaping political power and public debate?",
+    "query": "gun control firearms politics executive election government",
+    "accent": "red",
+    "hero_image": "hero-panel"
+  },
+  {
+    "name": "Religion",
+    "slug": "religion",
+    "description": "Faith-based arguments, religious advocacy, and moral teaching about guns and violence.",
+    "question": "How are faith communities responding to firearms and gun violence?",
+    "query": "religion faith gun control firearms violence advocacy",
+    "accent": "gold",
+    "hero_image": "hero-panel"
+  },
+  {
+    "name": "Law",
+    "slug": "law",
+    "description": "Court rulings, enforcement, liability, legal doctrine, and the operation of firearms law.",
+    "question": "Where do firearms rules, individual rights, and public safety meet in law?",
+    "query": "firearms gun control law court ruling enforcement government",
+    "accent": "steel",
+    "hero_image": "hero-panel"
+  },
+  {
+    "name": "Legislation",
+    "slug": "legislation",
+    "description": "Federal, state, and local bills and enacted measures governing firearms.",
+    "question": "Which firearms measures are lawmakers proposing or enacting?",
+    "query": "gun control firearms legislation bill federal state local",
+    "accent": "crimson",
+    "hero_image": "hero-panel"
+  },
+  {
+    "name": "Opinion",
+    "slug": "opinion",
+    "description": "Arguments, commentary, and competing public perspectives on guns and regulation.",
+    "question": "Which values and assumptions drive the firearms debate?",
+    "query": "gun control firearms opinion commentary public debate",
+    "accent": "stone",
+    "hero_image": "hero-panel"
+  },
+  {
+    "name": "Activism",
+    "slug": "activism",
+    "description": "Advocacy organizations, campaigns, protests, and public action around firearms policy.",
+    "question": "Who is organizing around gun policy, and what changes do they seek?",
+    "query": "gun control firearms activism advocacy campaign protest",
+    "accent": "green",
+    "hero_image": "hero-panel"
+  },
+  {
+    "name": "Ethics",
+    "slug": "ethics",
+    "description": "Moral responsibility, safety, rights, harm, and ethical questions raised by firearms.",
+    "question": "What ethical duties should guide firearms ownership and policy?",
+    "query": "gun control firearms ethics morality public safety rights",
+    "accent": "teal",
+    "hero_image": "hero-panel"
+  },
+  {
+    "name": "Culture",
+    "slug": "culture",
+    "description": "Media, history, identity, recreation, and the place of firearms in American culture.",
+    "question": "How does culture shape what Americans believe about guns?",
+    "query": "guns firearms culture media history identity America",
+    "accent": "amber",
+    "hero_image": "hero-panel"
+  },
+  {
+    "name": "Uncategorized",
+    "slug": "uncategorized",
+    "description": "Historical posts that were not assigned a topic on the original WordPress site.",
+    "question": "Which archived items still need a permanent topic?",
+    "query": "gun control firearms government",
+    "accent": "stone",
+    "hero_image": "hero-panel",
+    "nav": false
+  }
+]

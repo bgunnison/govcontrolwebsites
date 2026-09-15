@@ -1,0 +1,83 @@
+[
+  {
+    "name": "Politics",
+    "slug": "politics",
+    "description": "Executive action, party platforms, agency leadership, elections, and public power around AI.",
+    "question": "How is AI becoming a political issue inside government itself?",
+    "query": "AI politics government executive agency election policy site:gov OR site:edu OR site:org",
+    "accent": "navy",
+    "hero_image": "hero-panel"
+  },
+  {
+    "name": "Legislation",
+    "slug": "legislation",
+    "description": "Federal and state bills, rulemaking efforts, and formal attempts to regulate AI systems.",
+    "question": "What new laws are governments trying to write around AI?",
+    "query": "artificial intelligence legislation bill rulemaking government site:gov OR site:edu OR site:org",
+    "accent": "red",
+    "hero_image": "hero-panel"
+  },
+  {
+    "name": "Law",
+    "slug": "law",
+    "description": "Courts, administrative law, liability, constitutional questions, and legal accountability for AI.",
+    "question": "Where do legal rights and automated systems collide?",
+    "query": "artificial intelligence law courts administrative law constitutional government site:gov OR site:edu OR site:org",
+    "accent": "steel",
+    "hero_image": "hero-panel"
+  },
+  {
+    "name": "Risk",
+    "slug": "risk",
+    "description": "Safety, security, systemic failure, military use, infrastructure exposure, and operational danger.",
+    "question": "Which AI systems create public risk faster than institutions can manage it?",
+    "query": "artificial intelligence risk safety security critical infrastructure military government site:gov OR site:edu OR site:org",
+    "accent": "crimson",
+    "hero_image": "hero-panel"
+  },
+  {
+    "name": "Privacy",
+    "slug": "privacy",
+    "description": "Surveillance, biometric systems, data collection, identification, and personal autonomy.",
+    "question": "What happens when identity and observation become automated?",
+    "query": "artificial intelligence privacy biometrics surveillance government site:gov OR site:edu OR site:org",
+    "accent": "teal",
+    "hero_image": "hero-panel"
+  },
+  {
+    "name": "Ethics",
+    "slug": "ethics",
+    "description": "Bias, fairness, labor, accountability, and the human consequences of automated decisions.",
+    "question": "What ethical obligations survive once AI is deployed at scale?",
+    "query": "artificial intelligence ethics fairness accountability labor government site:gov OR site:edu OR site:org",
+    "accent": "gold",
+    "hero_image": "hero-panel"
+  },
+  {
+    "name": "Culture",
+    "slug": "culture",
+    "description": "Entertainment, celebrity commentary, humor, and the broader cultural mood around AI.",
+    "question": "How is AI reshaping popular culture and public imagination?",
+    "query": "artificial intelligence culture entertainment celebrity movies humor site:gov OR site:edu OR site:org",
+    "accent": "stone",
+    "hero_image": "hero-panel"
+  },
+  {
+    "name": "Activism",
+    "slug": "activism",
+    "description": "Advocacy groups, campaigns, public pressure, and organized resistance or support around AI policy.",
+    "question": "Who is mobilizing the public around AI governance, and why?",
+    "query": "artificial intelligence activism advocacy campaign policy government site:gov OR site:edu OR site:org",
+    "accent": "green",
+    "hero_image": "hero-panel"
+  },
+  {
+    "name": "Future",
+    "slug": "future",
+    "description": "Long-range governance, frontier systems, international trends, and the next phase of public AI power.",
+    "question": "What kind of state capacity and control structure is AI building toward?",
+    "query": "artificial intelligence future governance frontier systems international standards government site:gov OR site:edu OR site:org",
+    "accent": "amber",
+    "hero_image": "hero-panel"
+  }
+]

@@ -1,0 +1,75 @@
+{
+  "branding": {
+    "site_name": "Government Gun Control",
+    "description": "Welcome to the Government Gun Control website, an ever-expanding collection of contemporary information dedicated to the study and understanding of firearms legislation, regulations, rights, and opinions. The archive serves policymakers, scholars, and the public with source-backed material about gun control and firearm culture in America."
+  },
+  "navigation": [],
+  "hero": {
+    "eyebrow": "Independent Archive",
+    "title": "Welcome to Government Gun Control",
+    "intro": "A category-driven archive of firearms law, legislation, constitutional rights, politics, ethics, activism, religion, and culture.",
+    "primary_cta_label": "Read the latest posts",
+    "primary_cta_href": "/posts/",
+    "secondary_cta_label": "About this site",
+    "secondary_cta_href": "/about/"
+  },
+  "sections": {
+    "categories": {
+      "eyebrow": "Categories",
+      "title": "Categories",
+      "link_label": "Browse all categories",
+      "link_href": "/categories/"
+    },
+    "latest": {
+      "eyebrow": "Latest",
+      "title": "Latest Posts",
+      "link_label": "All posts",
+      "link_href": "/posts/"
+    },
+    "featured": {
+      "eyebrow": "Public Interest",
+      "title": "Selected coverage"
+    }
+  },
+  "pages": {
+    "posts": {
+      "eyebrow": "Archive",
+      "title": "Latest Posts",
+      "intro": "The complete Government Gun Control archive, migrated from WordPress and ready for continuing source-backed updates."
+    },
+    "categories": {
+      "eyebrow": "Topic Archives",
+      "title": "Coverage categories",
+      "intro": "Browse firearms coverage by constitutional amendments, politics, religion, law, legislation, opinion, activism, ethics, and culture."
+    },
+    "about": {
+      "eyebrow": "About",
+      "title": "About This Site",
+      "intro": "Government Gun Control preserves and organizes source-backed material about firearms policy, rights, public safety, and American culture.",
+      "cards": [
+        {
+          "eyebrow": "1. Watch",
+          "title": "Track public action",
+          "body": "Coverage follows legislation, executive action, court decisions, advocacy, research, and public controversy.",
+          "accent": "navy"
+        },
+        {
+          "eyebrow": "2. Preserve",
+          "title": "Keep the archive intact",
+          "body": "The original WordPress articles, dates, categories, source links, documents, and media are retained in local files.",
+          "accent": "teal"
+        },
+        {
+          "eyebrow": "3. Publish",
+          "title": "Use a simple static site",
+          "body": "New source-backed posts join the same permanent archive without depending on a content-management system.",
+          "accent": "gold"
+        }
+      ]
+    }
+  },
+  "footer": {
+    "line_one": "",
+    "line_two": "GOVERNMENT GUN CONTROL\n© Virtual Robot"
+  }
+}

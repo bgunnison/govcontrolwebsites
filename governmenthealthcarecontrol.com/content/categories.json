@@ -1,0 +1,83 @@
+[
+  {
+    "name": "Access",
+    "slug": "access",
+    "description": "Availability, equity, rural care, and barriers to obtaining treatment.",
+    "question": "Who can obtain care, and where are the gaps?",
+    "query": "healthcare access equity rural care government",
+    "accent": "teal",
+    "hero_image": "hero-panel"
+  },
+  {
+    "name": "Cost",
+    "slug": "cost",
+    "description": "Prices, public spending, affordability, and healthcare payment reform.",
+    "question": "What drives healthcare cost, and who bears it?",
+    "query": "healthcare cost affordability spending government",
+    "accent": "gold",
+    "hero_image": "hero-panel"
+  },
+  {
+    "name": "Coverage",
+    "slug": "coverage",
+    "description": "Insurance markets, eligibility, enrollment, benefits, and coverage gaps.",
+    "question": "How are public decisions changing health coverage?",
+    "query": "health insurance coverage eligibility enrollment government",
+    "accent": "navy",
+    "hero_image": "hero-panel"
+  },
+  {
+    "name": "Public Programs",
+    "slug": "public-programs",
+    "description": "Medicare, Medicaid, veterans care, public health, and government delivery systems.",
+    "question": "How are public healthcare programs changing?",
+    "query": "Medicare Medicaid VA public health government program",
+    "accent": "green",
+    "hero_image": "hero-panel"
+  },
+  {
+    "name": "Law",
+    "slug": "law",
+    "description": "Court rulings, regulation, enforcement, liability, and patient rights.",
+    "question": "Where do healthcare systems, public authority, and individual rights meet in law?",
+    "query": "healthcare law court regulation patient rights government",
+    "accent": "steel",
+    "hero_image": "hero-panel"
+  },
+  {
+    "name": "Legislation",
+    "slug": "legislation",
+    "description": "Proposed and enacted healthcare measures at every level of government.",
+    "question": "Which healthcare changes are lawmakers considering or enacting?",
+    "query": "healthcare legislation bill federal state government",
+    "accent": "crimson",
+    "hero_image": "hero-panel"
+  },
+  {
+    "name": "Politics",
+    "slug": "politics",
+    "description": "Elections, executive action, agencies, parties, and political conflict around healthcare.",
+    "question": "How is healthcare shaping political power and public debate?",
+    "query": "healthcare politics executive election agency government",
+    "accent": "red",
+    "hero_image": "hero-panel"
+  },
+  {
+    "name": "Privacy",
+    "slug": "privacy",
+    "description": "Health data, surveillance, cybersecurity, consent, and digital-care systems.",
+    "question": "Who controls sensitive health information, and how is it protected?",
+    "query": "health data privacy cybersecurity surveillance government",
+    "accent": "amber",
+    "hero_image": "hero-panel"
+  },
+  {
+    "name": "Ethics",
+    "slug": "ethics",
+    "description": "Allocation, consent, discrimination, public duty, and institutional accountability.",
+    "question": "Which values should govern healthcare policy and delivery?",
+    "query": "healthcare ethics allocation consent discrimination government",
+    "accent": "stone",
+    "hero_image": "hero-panel"
+  }
+]

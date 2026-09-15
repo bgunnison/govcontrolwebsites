@@ -1,0 +1,4 @@
+requests>=2.32,<3
+Pillow>=10,<13
+paramiko>=3.5,<5
+scp>=0.16.1,<0.17

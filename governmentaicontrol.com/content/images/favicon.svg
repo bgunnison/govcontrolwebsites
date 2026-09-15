@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Government AI Control favicon">
+  <rect width="64" height="64" rx="10" fill="#0d3569"/>
+  <path
+    d="M32 10 L46 15 V28 C46 39 39 47 32 52 C25 47 18 39 18 28 V15 Z"
+    fill="none"
+    stroke="#ffc433"
+    stroke-width="3.5"
+    stroke-linejoin="round"
+  />
+  <rect x="28" y="24" width="8" height="8" rx="1.5" fill="#55bceb"/>
+  <path d="M32 20 V24" stroke="#55bceb" stroke-width="3" stroke-linecap="round"/>
+  <path d="M24 28 H28" stroke="#55bceb" stroke-width="3" stroke-linecap="round"/>
+  <path d="M36 28 H40" stroke="#55bceb" stroke-width="3" stroke-linecap="round"/>
+  <path d="M32 32 V38" stroke="#55bceb" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="32" cy="18" r="2.5" fill="#ffc433"/>
+  <circle cx="22" cy="28" r="2.5" fill="#ffc433"/>
+  <circle cx="42" cy="28" r="2.5" fill="#ffc433"/>
+  <circle cx="32" cy="40" r="2.5" fill="#ffc433"/>
+</svg>

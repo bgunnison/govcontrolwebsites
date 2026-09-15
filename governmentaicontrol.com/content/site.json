@@ -1,0 +1,75 @@
+{
+  "branding": {
+    "site_name": "Government AI Control",
+    "description": "Welcome to the \"Government AI Control\" web site, an ever-expanding collection of contemporary information dedicated to the study and understanding of artificial intelligence legislation, regulations, risks, and opinions. Our goal is to provide everyone including policymakers, scholars, and the public with a curated selection of resources relating to AI governance and public power. With responsible discussion we can navigate this complex terrain and contribute to a more accountable technological society."
+  },
+  "navigation": [],
+  "hero": {
+    "eyebrow": "Independent Archive",
+    "title": "Welcome to Government AI Control",
+    "intro": "A category-driven archive about how artificial intelligence is shaping law, politics, privacy, risk, ethics, activism, and the future of public power.",
+    "primary_cta_label": "Read the latest posts",
+    "primary_cta_href": "/posts/",
+    "secondary_cta_label": "About this site",
+    "secondary_cta_href": "/about/"
+  },
+  "sections": {
+    "categories": {
+      "eyebrow": "Categories",
+      "title": "Categories",
+      "link_label": "Browse all categories",
+      "link_href": "/categories/"
+    },
+    "latest": {
+      "eyebrow": "Latest",
+      "title": "Latest Posts",
+      "link_label": "All posts",
+      "link_href": "/posts/"
+    },
+    "featured": {
+      "eyebrow": "High Risk",
+      "title": "Flagged dossiers"
+    }
+  },
+  "pages": {
+    "posts": {
+      "eyebrow": "Archive",
+      "title": "Latest Posts",
+      "intro": "The latest posts and background reporting on AI governance, regulation, public risk, and institutional power."
+    },
+    "categories": {
+      "eyebrow": "Topic Archives",
+      "title": "Coverage categories",
+      "intro": "Browse the archive by topic, from legislation and law to privacy, ethics, activism, and long-range government planning around AI."
+    },
+    "about": {
+      "eyebrow": "About",
+      "title": "About This Site",
+      "intro": "Government AI Control tracks how artificial intelligence is being shaped by public institutions, legal systems, and organized political power.",
+      "cards": [
+        {
+          "eyebrow": "1. Watch",
+          "title": "Track official action",
+          "body": "The site focuses on laws, agencies, court decisions, procurement rules, and public controversies that shape how AI is used and governed.",
+          "accent": "navy"
+        },
+        {
+          "eyebrow": "2. Update",
+          "title": "Publish from local research",
+          "body": "New posts are generated from curated source lists, reviewed locally, and rendered into static pages without a CMS.",
+          "accent": "teal"
+        },
+        {
+          "eyebrow": "3. Publish",
+          "title": "Keep the archive simple",
+          "body": "The site is designed as a straightforward public archive: topic-based navigation, permanent pages, and plain HTML output.",
+          "accent": "gold"
+        }
+      ]
+    }
+  },
+  "footer": {
+    "line_one": "",
+    "line_two": "GOVERNMENT AI CONTROL\n© Virtual Robot"
+  }
+}
