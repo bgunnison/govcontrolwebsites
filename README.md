@@ -120,8 +120,12 @@ The installer preserves existing cron jobs, saves the old crontab privately in
 `logs/`, and verifies the new entry without starting it. Disable the old desktop
 task after validating the server installation to avoid duplicate API usage and
 deployments. Server posts become the working archive; sync them privately before
-using the desktop's manual deployment commands. Backups made on Bluehost share
-the hosting account; retain a separate off-server copy for recovery.
+using the desktop's manual deployment commands. Website backups are manual and
+kept on your desktop: run `backup.bat` periodically from the local project.
+For recovery of the editable articles and automation, also copy the server's
+private `app/<website>/content/` directories, `app/<website>/update/prompts.py`
+(topic progress), and `app/private.py` to private local storage. `backup.bat`
+downloads only the published website directories.
 
 Windows Task Scheduler remains an alternative: `GovControl Weekly Update and Deploy`
 runs every Sunday at **10:00 PM Pacific**, following Windows daylight-saving time. Codex does not
@@ -130,11 +134,12 @@ is fine, but signing out prevents it from running until you sign in again.
 It requests wake-from-sleep and runs a missed schedule when Windows is available.
 
 The scheduled runner executes `update_all.py` (news, builds, tests), then
-`backup_all.py`, then `deploy_all.py`. A failure stops subsequent steps. Research
+`deploy_all.py`. It does not create server-side website backups. A failure stops
+subsequent steps. Research
 and summary errors also block deployment even if the updater exits successfully.
 SCP uploads are limited to the active, enabled sites in the existing configuration.
 If deployment fails halfway through, already uploaded files are not automatically
-rolled back; consult the log and the pre-deployment backup.
+rolled back; consult the log and use your latest local backup if recovery is needed.
 
 Each run retains a dated log and JSON result in `logs/weekly/`.
 `WEEKLY_STATUS.txt` and `logs/weekly/latest-status.json` show the latest result;

@@ -1,4 +1,4 @@
-"""Once-weekly update -> verified backup -> SCP deployment on Windows or Linux."""
+"""Once-weekly update, build and test -> SCP deployment on Windows or Linux."""
 from __future__ import annotations
 
 import argparse
@@ -28,7 +28,6 @@ ERROR_EVENTS = {
 }
 STEPS = (
     ("Update, build and test", "update_all.py", ()),
-    ("Back up live websites", "backup_all.py", ("--no-pause",)),
     ("Deploy verified websites", "deploy_all.py", ()),
 )
 STEP_TIMEOUT_SECONDS = 3 * 60 * 60
@@ -162,7 +161,7 @@ def run_step(name: str, script: str, arguments: tuple[str, ...], log) -> None:
                 except (ValueError, UnicodeDecodeError):
                     continue
                 if isinstance(event, dict) and event.get("event") in ERROR_EVENTS:
-                    raise RuntimeError(f"Update reported {event['event']}; backup/deployment were not started.")
+                    raise RuntimeError(f"Update reported {event['event']}; deployment was not started.")
     log_line(log, f"PASS: {name}")
 
 
@@ -241,7 +240,7 @@ def execute_run(*, dry_run: bool = False) -> int:
     log_path = LOG_DIR / (("dry-run_" if dry_run else "") + stamp + ".log")
     with log_path.open("ab") as log:
         if dry_run:
-            log_line(log, "DRY RUN: no API calls, server connections, backups or deployments.")
+            log_line(log, "DRY RUN: no API calls, server connections or deployments.")
             for name, script, arguments in STEPS:
                 log_line(log, f"Would run {name}: {script} {' '.join(arguments)}")
             return 0
@@ -260,7 +259,7 @@ def execute_run(*, dry_run: bool = False) -> int:
                 # Record the attempt BEFORE any paid work. Failed runs are not retried automatically.
                 write_json(attempt_path, {"period": state["period"], "started_at": state["started_at"], "log": str(log_path)})
                 publish_status(state)
-                log_line(log, "Weekly run started. Only a successful update/test and verified backup permit deployment.")
+                log_line(log, "Weekly run started. Only a successful update, build and test permit deployment.")
                 for name, script, arguments in STEPS:
                     state["step"] = name
                     publish_status(state)
@@ -270,7 +269,7 @@ def execute_run(*, dry_run: bool = False) -> int:
                 state["finished_at"] = now_stamp()
                 publish_status(state)
                 write_json(log_path.with_suffix(".json"), state)
-                log_line(log, "SUCCESS: updates, tests, backups and deployment completed.")
+                log_line(log, "SUCCESS: updates, tests and deployment completed.")
                 try:
                     notify_failure(log_path, resolved=True)
                 except Exception as notice_error:
@@ -297,7 +296,7 @@ def execute_run(*, dry_run: bool = False) -> int:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Once-weekly update, test, backup and SCP deployment.")
+    parser = argparse.ArgumentParser(description="Once-weekly update, test and SCP deployment.")
     mode = parser.add_mutually_exclusive_group(required=True)
     mode.add_argument("--scheduled", action="store_true")
     mode.add_argument("--dry-run", action="store_true")

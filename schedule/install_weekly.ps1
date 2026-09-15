@@ -24,12 +24,12 @@ $trigger = New-ScheduledTaskTrigger -Weekly -WeeksInterval 1 -DaysOfWeek Sunday 
 $trigger.StartBoundary = (Get-Date).Date.AddHours(22).ToString('yyyy-MM-ddTHH:mm:ss')
 $principal = New-ScheduledTaskPrincipal -UserId $user -LogonType Interactive -RunLevel Limited
 $settings = New-ScheduledTaskSettingsSet -StartWhenAvailable -WakeToRun -MultipleInstances IgnoreNew -ExecutionTimeLimit (New-TimeSpan -Hours 10) -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries
-$description = 'Sunday 10 PM Pacific: update/build/test all sites, back up live files, then SCP-deploy only if preceding steps pass. No automatic failure retries. Logs: ' + (Join-Path $projectRoot 'logs\weekly') + '. Runs under the signed-in Windows user; Codex is not required.'
+$description = 'Sunday 10 PM Pacific: update/build/test all sites, then SCP-deploy only if preceding steps pass. Backups are manual. No automatic failure retries. Logs: ' + (Join-Path $projectRoot 'logs\weekly') + '. Runs under the signed-in Windows user; Codex is not required.'
 Register-ScheduledTask -TaskName $taskName -Action $action -Trigger $trigger -Principal $principal -Settings $settings -Description $description -Force | Out-Null
 $task = Get-ScheduledTask -TaskName $taskName
 $info = Get-ScheduledTaskInfo -TaskName $taskName
 if (-not (Test-Path -LiteralPath (Join-Path $projectRoot 'logs\weekly\latest-status.json'))) {
-    $initialStatus = "GOVCONTROL WEEKLY AUTOMATION: SCHEDULED`r`nNext run: $($info.NextRunTime) Pacific`r`nWeekly: Sunday 10:00 PM Pacific`r`nSequence: update/build/test, backup, deploy`r`nCodex can be closed; stay signed in to Windows.`r`nRun weekly_status.bat for task status and logs."
+    $initialStatus = "GOVCONTROL WEEKLY AUTOMATION: SCHEDULED`r`nNext run: $($info.NextRunTime) Pacific`r`nWeekly: Sunday 10:00 PM Pacific`r`nSequence: update/build/test, deploy`r`nCodex can be closed; stay signed in to Windows.`r`nRun weekly_status.bat for task status and logs."
     $initialStatus | Set-Content -LiteralPath (Join-Path $projectRoot 'WEEKLY_STATUS.txt') -Encoding UTF8
 }
 [pscustomobject]@{

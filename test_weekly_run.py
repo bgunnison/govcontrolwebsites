@@ -34,17 +34,17 @@ class WeeklyRunTests(unittest.TestCase):
         self.assertEqual(weekly.weekly_period(datetime(2026, 9, 21, 10)), "2026-09-20")
         self.assertEqual(weekly.weekly_period(datetime(2026, 11, 1, 22)), "2026-11-01")
 
-    def test_success_requires_update_then_backup_then_deploy(self):
+    def test_success_requires_update_then_deploy_without_backup(self):
         with patch.object(weekly, "run_step") as step:
             self.assertEqual(weekly.execute_run(), 0)
         self.assertEqual([call.args[1] for call in step.call_args_list],
-                         ["update_all.py", "backup_all.py", "deploy_all.py"])
+                         ["update_all.py", "deploy_all.py"])
         self.assertEqual(self.state()["status"], "success")
         self.assertTrue(Path(self.state()["log"]).exists())
         self.assertTrue((self.root / "WEEKLY_STATUS.txt").exists())
         self.notify.assert_called_once_with(Path(self.state()["log"]), resolved=True)
 
-    def test_update_failure_prevents_backup_and_deploy_and_alerts(self):
+    def test_update_failure_prevents_deploy_and_alerts(self):
         with patch.object(weekly, "run_step", side_effect=RuntimeError("test update failure")) as step:
             self.assertEqual(weekly.execute_run(), 1)
         step.assert_called_once()
@@ -53,16 +53,10 @@ class WeeklyRunTests(unittest.TestCase):
         self.assertIn("FAILED", (self.root / "WEEKLY_STATUS.txt").read_text())
         self.notify.assert_called_once()
 
-    def test_backup_failure_prevents_deploy(self):
-        with patch.object(weekly, "run_step", side_effect=[None, RuntimeError("test backup failure")]) as step:
-            self.assertEqual(weekly.execute_run(), 1)
-        self.assertEqual(step.call_count, 2)
-        self.assertEqual(self.state()["step"], "Back up live websites")
-        self.assertEqual(self.state()["status"], "failed")
-
     def test_deploy_failure_is_not_reported_as_success(self):
-        with patch.object(weekly, "run_step", side_effect=[None, None, RuntimeError("test deploy failure")]):
+        with patch.object(weekly, "run_step", side_effect=[None, RuntimeError("test deploy failure")]):
             self.assertEqual(weekly.execute_run(), 1)
+        self.assertEqual(self.state()["step"], "Deploy verified websites")
         self.assertEqual(self.state()["status"], "failed")
         self.assertIn("some sites/files may already have been uploaded",
                       (self.root / "WEEKLY_STATUS.txt").read_text())
@@ -82,7 +76,7 @@ class WeeklyRunTests(unittest.TestCase):
                 weekly.execute_run()
             with patch.object(weekly, "weekly_period", return_value="2026-09-27"):
                 weekly.execute_run()
-        self.assertEqual(step.call_count, 6)
+        self.assertEqual(step.call_count, 4)
 
     def test_busy_lock_does_not_replace_running_status(self):
         self.logs.mkdir(parents=True)
