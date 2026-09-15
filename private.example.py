@@ -31,6 +31,7 @@ SSH_DRY_RUN = False
 
 # Each value must be the full absolute SSH path to that domain's document root,
 # including the account's home directory (not an FTP-root-relative path).
-AI_PATH = "/home/username/public_html/governmentaicontrol.com"
-GUN_PATH = "/home/username/public_html/governmentguncontrol.com"
-HEALTHCARE_PATH = "/home/username/public_html/governmenthealthcarecontrol.com"
+# Fill these in only in your ignored private.py file.
+AI_PATH = ""
+GUN_PATH = ""
+HEALTHCARE_PATH = ""
