@@ -17,6 +17,36 @@ from weekly_run import alert_recipient
 
 BEGIN = "# BEGIN GOVCONTROL WEEKLY"
 END = "# END GOVCONTROL WEEKLY"
+NATIVE_CRONTAB = Path("/usr/bin/crontab")
+
+
+def read_crontab(command: str) -> str:
+    result = subprocess.run(
+        [command, "-l"], capture_output=True, text=True, check=False, timeout=30,
+    )
+    if result.returncode == 0:
+        return result.stdout
+    if result.returncode == 1 and result.stderr.strip().lower().startswith("no crontab for "):
+        return ""
+    raise RuntimeError(
+        f"Cron access check failed for {command}: {result.stderr.strip() or 'unknown error'}. "
+        "Ask the hosting provider to restore this account's cron access."
+    )
+
+
+def check_native_crontab(expected: str | None = None) -> None:
+    # A jailed-shell wrapper can accept a file even when the real cron service
+    # denies this account. Verify both permission and the installed entry there.
+    selected = shutil.which("crontab")
+    if not selected:
+        raise RuntimeError("crontab is not installed.")
+    if NATIVE_CRONTAB.is_file() and NATIVE_CRONTAB.resolve() != Path(selected).resolve():
+        actual = read_crontab(str(NATIVE_CRONTAB))
+        if expected is not None and actual.strip() != expected.strip():
+            raise RuntimeError(
+                "The native cron service did not retain the requested schedule. "
+                "Ask the hosting provider to investigate before relying on automatic runs."
+            )
 
 
 def cron_text(existing: str, recipient: str, root: Path, python: Path) -> str:
@@ -56,10 +86,8 @@ def main() -> None:
         if stat.S_IMODE(path.stat().st_mode) & 0o077:
             raise RuntimeError("The project directory and private.py must be restricted to the account owner.")
     recipient = alert_recipient()
-    result = subprocess.run(["crontab", "-l"], capture_output=True, text=True, check=False)
-    if result.returncode and "no crontab" not in result.stderr.lower():
-        raise RuntimeError("Could not read the existing crontab; nothing was changed.")
-    existing = result.stdout if result.returncode == 0 else ""
+    check_native_crontab()
+    existing = read_crontab("crontab")
     # Do not resolve the virtualenv symlink: its location selects its packages.
     updated = cron_text(existing, recipient, ROOT.resolve(), Path(sys.executable).absolute())
     if not args.install:
@@ -71,10 +99,11 @@ def main() -> None:
     backup = backup_dir / ("crontab-before-" + datetime.now().strftime("%Y%m%dT%H%M%S%f") + ".txt")
     backup.write_text(existing, encoding="utf-8")
     subprocess.run(["crontab", "-"], input=updated, text=True, check=True)
-    installed = subprocess.check_output(["crontab", "-l"], text=True)
+    installed = read_crontab("crontab")
     if installed.strip() != updated.strip():
         raise RuntimeError("Cron verification did not match the requested schedule.")
-    print("Installed and verified: Sunday 10 PM server local time. No job was started.")
+    check_native_crontab(updated)
+    print("Cron entry installed and read back: Sunday 10 PM server local time. Execution has not been tested.")
 
 
 if __name__ == "__main__":

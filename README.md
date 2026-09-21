@@ -95,8 +95,8 @@ It is a guardrail, not a guarantee that arbitrary secrets cannot be committed.
 
 ## Weekly automatic update and deployment
 
-The production schedule runs on Bluehost every **Sunday at 10 PM server local
-time**, independently of the desktop. It uses a private Python 3.11 environment
+The production schedule is configured for **Sunday at 10 PM server local
+time** on Bluehost, independently of the desktop. It uses a private Python 3.11 environment
 and a source/content directory outside the public web roots. `private.py` is
 owner-readable only (600), inside an owner-only directory (700). Actual posts,
 credentials, notification recipients, logs, and backups are kept out of GitHub.
@@ -116,8 +116,14 @@ python weekly_run.py --test-email
 python schedule/install_linux.py --install
 ```
 
-The installer preserves existing cron jobs, saves the old crontab privately in
-`logs/`, and verifies the new entry without starting it. Disable the old desktop
+The installer checks access to the native cron service as well as any jailed-shell
+wrapper, preserves existing cron jobs, saves the old crontab privately in `logs/`,
+and reads back the new entry without starting it. A saved entry alone does not
+prove that cron will execute it. If the native command reports that the account
+is not allowed to use crontab, Bluehost must restore its cron permission.
+If cron never starts the runner, the runner cannot send a failure email; check
+`logs/weekly/last-attempt.json` after the scheduled time to confirm it started.
+Disable the old desktop
 task after validating the server installation to avoid duplicate API usage and
 deployments. Server posts become the working archive; sync them privately before
 using the desktop's manual deployment commands. Website backups are manual and

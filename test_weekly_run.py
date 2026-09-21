@@ -12,6 +12,7 @@ from pathlib import Path, PurePosixPath
 from unittest.mock import patch
 
 import weekly_run as weekly
+from schedule import install_linux as linux_schedule
 from schedule.install_linux import cron_text
 
 
@@ -199,6 +200,42 @@ class PlatformAndEmailTests(unittest.TestCase):
         self.assertTrue(configured.startswith(existing))
         self.assertIn("0 22 * * 0 cd '/home/test/private app'", configured)
         self.assertEqual(cron_text(configured, "alerts@example.com", PurePosixPath("/home/test/private app"), PurePosixPath("/home/test/venv/bin/python")), configured)
+
+
+class CronAccessTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = self.enterContext(tempfile.TemporaryDirectory())
+        self.native = Path(self.temp) / "native-crontab"
+        self.native.touch()
+        self.enterContext(patch.object(linux_schedule, "NATIVE_CRONTAB", self.native))
+        self.enterContext(patch.object(linux_schedule.shutil, "which", return_value=str(Path(self.temp) / "wrapper")))
+
+    def test_native_permission_denial_is_not_treated_as_success(self):
+        denied = subprocess.CompletedProcess([], 1, "", "You (test) are not allowed to use this program (crontab)\n")
+        with patch.object(linux_schedule.subprocess, "run", return_value=denied) as run:
+            with self.assertRaisesRegex(RuntimeError, "hosting provider"):
+                linux_schedule.check_native_crontab()
+        self.assertEqual(run.call_args.args[0], [str(self.native), "-l"])
+
+    def test_new_account_without_a_crontab_can_pass_the_access_check(self):
+        missing = subprocess.CompletedProcess([], 1, "", "no crontab for test\n")
+        with patch.object(linux_schedule.subprocess, "run", return_value=missing):
+            linux_schedule.check_native_crontab()
+
+    def test_native_commented_or_missing_entry_fails_verification(self):
+        expected = "0 22 * * 0 /home/test/run\n"
+        for actual in ("#" + expected, ""):
+            with self.subTest(actual=actual):
+                result = subprocess.CompletedProcess([], 0, actual, "")
+                with patch.object(linux_schedule.subprocess, "run", return_value=result):
+                    with self.assertRaisesRegex(RuntimeError, "did not retain"):
+                        linux_schedule.check_native_crontab(expected)
+
+    def test_matching_native_entry_passes_verification(self):
+        expected = "0 22 * * 0 /home/test/run\n"
+        result = subprocess.CompletedProcess([], 0, expected, "")
+        with patch.object(linux_schedule.subprocess, "run", return_value=result):
+            linux_schedule.check_native_crontab(expected)
 
 
 if __name__ == "__main__":
