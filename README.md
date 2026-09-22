@@ -113,16 +113,40 @@ python -m unittest test_weekly_run test_backup test_ssh_deploy
 python update_all.py --build-only
 python weekly_run.py --dry-run
 python weekly_run.py --test-email
-python schedule/install_linux.py --install
 ```
 
-The installer checks access to the native cron service as well as any jailed-shell
-wrapper, preserves existing cron jobs, saves the old crontab privately in `logs/`,
-and reads back the new entry without starting it. A saved entry alone does not
-prove that cron will execute it. If the native command reports that the account
-is not allowed to use crontab, Bluehost must restore its cron permission.
+### Bluehost schedule in cPanel
+
+Manage this hosting account's schedule through **cPanel → Cron Jobs**. SSH access
+to native `crontab` is restricted on this account; that restriction does not
+prevent cPanel-created jobs from running. Set Cron Email to the same private
+address as `WEEKLY_ALERT_EMAIL`, and add one job with these fields:
+
+| Minute | Hour | Day | Month | Weekday |
+| --- | --- | --- | --- | --- |
+| `0` | `22` | `*` | `*` | `0` |
+
+Enter this command, replacing the example paths with the private installation's
+absolute paths. Do not include the five schedule fields in the Command box.
+
+```sh
+cd /path/to/private/app && umask 077 && PYTHONUTF8=1 PYTHONIOENCODING=utf-8 /path/to/private/venv/bin/python /path/to/private/app/weekly_run.py --scheduled
+```
+
+To verify a new installation, temporarily set that job to every minute and use
+`--dry-run` instead of `--scheduled`. Confirm a new `logs/weekly/dry-run_*.log`
+appears without launching the command yourself. Then edit the same job back to
+the Sunday schedule and `--scheduled`, and confirm the saved values. The dry run
+does not spend API credits, publish files, or consume the weekly attempt.
+
+On hosts that support cron management over SSH, use
+`python schedule/install_linux.py --install`. The installer checks native cron
+access as well as any jailed-shell wrapper, preserves existing jobs, saves the
+old crontab privately in `logs/`, and reads back the new entry without starting it.
+A saved entry alone does not prove that cron will execute it.
 If cron never starts the runner, the runner cannot send a failure email; check
 `logs/weekly/last-attempt.json` after the scheduled time to confirm it started.
+
 Disable the old desktop
 task after validating the server installation to avoid duplicate API usage and
 deployments. Server posts become the working archive; sync them privately before
