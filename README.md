@@ -95,8 +95,10 @@ It is a guardrail, not a guarantee that arbitrary secrets cannot be committed.
 
 ## Weekly automatic update and deployment
 
-The production schedule is configured for **Sunday at 10 PM server local
-time** on Bluehost, independently of the desktop. It uses a private Python 3.11 environment
+The production trigger uses a **private GitHub Actions scheduler** for **Sunday
+at 10 PM America/Denver**, matching Bluehost's server local time and following
+daylight-saving changes. The updater runs on Bluehost, independently of the
+desktop and Codex. It uses a private Python 3.11 environment
 and a source/content directory outside the public web roots. `private.py` is
 owner-readable only (600), inside an owner-only directory (700). Actual posts,
 credentials, notification recipients, logs, and backups are kept out of GitHub.
@@ -115,29 +117,43 @@ python weekly_run.py --dry-run
 python weekly_run.py --test-email
 ```
 
-### Bluehost schedule in cPanel
+### Private GitHub scheduler
 
-Manage this hosting account's schedule through **cPanel → Cron Jobs**. SSH access
-to native `crontab` is restricted on this account; that restriction does not
-prevent cPanel-created jobs from running. Set Cron Email to the same private
-address as `WEEKLY_ALERT_EMAIL`, and add one job with these fields:
+The trigger lives in [govcontrol-scheduler](https://github.com/bgunnison/govcontrol-scheduler)
+(private). Its workflow stores a dedicated SSH private key as an Actions secret.
+The server's matching public key uses `restrict` and a forced command invoking
+`schedule/github_ssh_entry.py` with the private Python interpreter. Existing SSH
+keys are preserved. The scheduler key accepts exactly `check`, `status`, or `run`;
+shell commands, file transfers, terminal allocation, and port forwarding are
+disabled. GitHub pins the verified server host key and does not fetch application
+code, posts, API keys, or private logs from the server.
 
-| Minute | Hour | Day | Month | Weekday |
-| --- | --- | --- | --- | --- |
-| `0` | `22` | `*` | `*` | `0` |
+Use **Actions → Weekly website update → Run workflow** in the private repository:
 
-Enter this command, replacing the example paths with the private installation's
-absolute paths. Do not include the five schedule fields in the Command box.
+- `check` runs `weekly_run.py --dry-run`; it makes no API calls, publishes nothing,
+  and consumes no weekly attempt.
+- `status` returns only the latest status and dates.
+- `run` starts the existing once-weekly update and deployment. A previous failed
+  attempt remains a failure and is not automatically retried.
 
-```sh
-cd /path/to/private/app && umask 077 && PYTHONUTF8=1 PYTHONIOENCODING=utf-8 /path/to/private/venv/bin/python /path/to/private/app/weekly_run.py --scheduled
-```
+The private repository avoids GitHub's inactivity shutdown for public repository
+schedules. GitHub may delay a scheduled start; it is not an exact-time guarantee.
+Standard runner minutes count toward the account's included private-repository
+allowance. The workflow has no GitHub token permissions and uses no third-party
+actions. The updater's existing API cost limit and run lock still apply.
 
-To verify a new installation, temporarily set that job to every minute and use
-`--dry-run` instead of `--scheduled`. Confirm a new `logs/weekly/dry-run_*.log`
-appears without launching the command yourself. Then edit the same job back to
-the Sunday schedule and `--scheduled`, and confirm the saved values. The dry run
-does not spend API credits, publish files, or consume the weekly attempt.
+Updater failures retain the existing server email alert. Connection or startup
+failures produce a failed GitHub run; enable GitHub Actions email notifications
+for the account that creates the schedule to receive those alerts too. Disabling
+the workflow stops the trigger; removing only the `govcontrol-github-scheduler`
+authorized-key entry revokes its server access.
+
+### Other scheduling methods
+
+This Bluehost account's native SSH `crontab` access is restricted. cPanel jobs
+did execute short tests, but both weekly and test entries were repeatedly
+commented out by an unidentified process. Saving a cPanel entry did not provide
+reliable scheduling. Keep those entries inactive when using the GitHub trigger.
 
 On hosts that support cron management over SSH, use
 `python schedule/install_linux.py --install`. The installer checks native cron
@@ -147,8 +163,8 @@ A saved entry alone does not prove that cron will execute it.
 If cron never starts the runner, the runner cannot send a failure email; check
 `logs/weekly/last-attempt.json` after the scheduled time to confirm it started.
 
-Disable the old desktop
-task after validating the server installation to avoid duplicate API usage and
+Keep the old desktop
+task disabled after validating the server installation to avoid duplicate API usage and
 deployments. Server posts become the working archive; sync them privately before
 using the desktop's manual deployment commands. Website backups are manual and
 kept on your desktop: run `backup.bat` periodically from the local project.

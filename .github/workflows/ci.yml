@@ -35,7 +35,7 @@ jobs:
       - name: Verify posts stay excluded from Git
         run: python -m unittest scripts.test_check_repository
       - name: Run offline orchestration tests
-        run: python -m unittest test_weekly_run test_backup test_ssh_deploy
+        run: python -m unittest test_weekly_run test_backup test_ssh_deploy test_github_ssh_entry
       - name: Build and verify all three sites with empty archives
         run: python update_all.py --build-only
       - name: Parse Windows scheduling scripts without installing or running them
