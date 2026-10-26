@@ -259,6 +259,9 @@ def category_post_counts(posts: list[dict[str, Any]]) -> dict[str, int]:
 
 
 def html_text(value: str) -> str:
+    # Scraped text can contain NULs or other characters forbidden in XML 1.0.
+    # Remove them before escaping so both HTML pages and RSS remain readable.
+    value = re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f\ud800-\udfff\ufffe\uffff]", "", value)
     return (
         value.replace("&", "&amp;")
         .replace("<", "&lt;")

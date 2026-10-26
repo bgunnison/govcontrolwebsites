@@ -12,6 +12,7 @@ from build.build_site import build_site
 from site_config import SITE_SETTINGS
 from test.test_update_resilience import verify_update_resilience
 from test.test_publication_dates import verify_publication_dates
+from test.test_feed_text import verify_feed_text
 from test.verify_site import verify_site
 
 
@@ -20,6 +21,7 @@ def main() -> None:
         raise RuntimeError("Python source compilation failed.")
     verify_update_resilience()
     verify_publication_dates()
+    verify_feed_text()
     output = build_site()
     result = verify_site()
     print(
