@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 from datetime import datetime
@@ -104,14 +105,25 @@ DEFAULT_CATEGORY_LIBRARY: dict[str, dict[str, str]] = {
 DEFAULT_ACCENTS = ["navy", "red", "steel", "crimson", "teal", "gold", "stone", "green", "amber"]
 
 
+MAX_POST_SLUG_LENGTH = 120
+
+
 def unique_slug(base: str, existing: set[str]) -> str:
     candidate = slugify(base)
+    if len(candidate) > MAX_POST_SLUG_LENGTH:
+        # Keep filenames and URL directories portable; retain a stable identity
+        # for long titles that have the same beginning.
+        digest = hashlib.sha256(candidate.encode("ascii")).hexdigest()[:12]
+        candidate = candidate[:MAX_POST_SLUG_LENGTH - 13].rstrip("-") + "-" + digest
     if candidate not in existing:
         return candidate
     idx = 2
-    while f"{candidate}-{idx}" in existing:
+    while True:
+        suffix = f"-{idx}"
+        unique = candidate[:MAX_POST_SLUG_LENGTH - len(suffix)].rstrip("-") + suffix
+        if unique not in existing:
+            return unique
         idx += 1
-    return f"{candidate}-{idx}"
 
 
 def parse_date(value: str) -> datetime:
